@@ -1,2 +1,2 @@
 # customer-churn-prediction-ml
-End-to-end ML project predicting telecom customer churn with deployment and model interpretability.
+End-to-end churn prediction project: data engineering, modeling, interpretation, and deployment.
