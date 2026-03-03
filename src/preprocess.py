@@ -1,6 +1,8 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
 
 
 def load_data(path):
@@ -16,18 +18,26 @@ def split_data(df):
     y = df["churn"]
 
     return train_test_split(
-        X, y,
+        X,
+        y,
         test_size=0.2,
         random_state=42,
         stratify=y
     )
 
 
-def scale_features(X_train, X_test, numerical_cols):
-    # scales numerical features only
-    scaler = StandardScaler()
+def build_preprocessor(X):
+    numerical_cols = X.select_dtypes(include=["int64", "float64"]).columns.tolist()
+    categorical_cols = X.select_dtypes(include=["object"]).columns.tolist()
 
-    X_train[numerical_cols] = scaler.fit_transform(X_train[numerical_cols])
-    X_test[numerical_cols] = scaler.transform(X_test[numerical_cols])
+    numeric_transformer = StandardScaler()
+    categorical_transformer = OneHotEncoder(drop="first", handle_unknown="ignore")
 
-    return X_train, X_test, scaler
+    preprocessor = ColumnTransformer(
+        transformers=[
+            ("num", numeric_transformer, numerical_cols),
+            ("cat", categorical_transformer, categorical_cols),
+        ]
+    )
+
+    return preprocessor
