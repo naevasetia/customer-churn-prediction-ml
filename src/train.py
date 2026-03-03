@@ -9,6 +9,11 @@ from preprocess import load_data, split_data, build_preprocessor
 from sklearn.pipeline import Pipeline
 
 
+from sklearn.metrics import confusion_matrix
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+
 def main():
 
     # Path to dataset
@@ -25,7 +30,7 @@ def main():
     model = Pipeline(
         steps=[
             ("preprocessor", preprocessor),
-            ("classifier", LogisticRegression(max_iter=1000))
+            ("classifier", LogisticRegression(max_iter=1000, class_weight="balanced"))
         ]
     )
 
@@ -39,6 +44,16 @@ def main():
     # Evaluation
     print("Classification Report:")
     print(classification_report(y_test, y_pred))
+
+    # Confusion Matrix
+    cm = confusion_matrix(y_test, y_pred)
+
+    plt.figure(figsize=(5, 4))
+    sns.heatmap(cm, annot=True, fmt="d", cmap="Blues")
+    plt.title("Confusion Matrix")
+    plt.xlabel("Predicted")
+    plt.ylabel("Actual")
+    plt.show()
 
     print("ROC-AUC Score:", roc_auc_score(y_test, y_prob))
 
